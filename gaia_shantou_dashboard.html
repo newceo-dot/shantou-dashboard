@@ -270,6 +270,17 @@ a { color: inherit; text-decoration: none; }
   overflow-y: auto;
   box-shadow: var(--shadow);
 }
+@media (max-width: 768px) {
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    border-bottom: none;
+  }
+  .modal-header { padding: 16px 20px 12px; }
+  .modal-body { padding: 16px 20px; }
+  .modal-footer { padding: 12px 20px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
 .modal-header {
   padding: 20px 24px 16px;
   border-bottom: 1px solid var(--border);
@@ -306,6 +317,11 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   min-height: 200px;
 }
+@media (max-width: 768px) {
+  .task-column { min-height: auto; }
+  .task-col-header { cursor: pointer; }
+  .task-col-body { max-height: none; }
+}
 .task-col-header {
   padding: 14px 16px 10px;
   border-bottom: 1px solid var(--border);
@@ -334,6 +350,8 @@ a { color: inherit; text-decoration: none; }
   cursor: grab;
   transition: all 0.15s;
   user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
 }
 .task-item:hover { border-color: var(--accent); background: var(--surface); }
 .task-item.dragging { opacity: 0.4; cursor: grabbing; }
@@ -417,7 +435,11 @@ a { color: inherit; text-decoration: none; }
 .venue-card .venue-addr { font-size: 11px; color: var(--text2); line-height: 1.5; }
 .venue-card .venue-desc { font-size: 12px; color: var(--text2); margin-top: 8px; line-height: 1.5; }
 .venue-card .venue-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-.venue-card .venue-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.venue-card .venue-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); gap: 8px; }
+@media (max-width: 768px) {
+  .venue-card .venue-footer { flex-direction: column; }
+  .venue-card .venue-footer .btn { width: 100%; justify-content: center; padding: 12px; font-size: 14px; }
+}
 
 /* ===== TIMELINE ===== */
 .timeline { display: flex; flex-direction: column; gap: 0; }
@@ -494,7 +516,7 @@ a { color: inherit; text-decoration: none; }
 .stars { color: var(--accent); font-size: 13px; letter-spacing: 2px; }
 
 /* ===== PHOTO GRID ===== */
-.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(140px, calc(50% - 6px)), 1fr)); gap: 8px; }
 .photo-item {
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
@@ -624,17 +646,115 @@ a { color: inherit; text-decoration: none; }
 .sync-dot.error { background: var(--red); }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+/* ===== MOBILE BOTTOM NAV ===== */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 50;
+  padding: 0 0 env(safe-area-inset-bottom);
+}
+.bottom-nav-inner {
+  display: flex;
+  align-items: stretch;
+}
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text3);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  gap: 3px;
+  transition: color 0.15s;
+  min-height: 56px;
+}
+.bottom-nav-item .bn-icon { font-size: 20px; line-height: 1; }
+.bottom-nav-item.active { color: var(--accent); }
+.bottom-nav-more {
+  position: fixed;
+  bottom: calc(56px + env(safe-area-inset-bottom));
+  left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 49;
+  display: none;
+  flex-direction: column;
+  padding: 8px;
+  gap: 4px;
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.3);
+}
+.bottom-nav-more.open { display: flex; }
+.bottom-nav-more-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  border: none;
+  background: none;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+.bottom-nav-more-item:hover, .bottom-nav-more-item.active { background: var(--surface2); color: var(--accent); }
+.bottom-nav-more-item .icon { font-size: 20px; width: 28px; }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .sidebar { width: 60px; min-width: 60px; }
-  .sidebar-logo .title, .sidebar-logo .brand, .sidebar-logo .subtitle { display: none; }
-  .nav-item span:not(.icon) { display: none; }
-  .nav-item { justify-content: center; padding: 12px; }
-  .sidebar-bottom { display: none; }
+  .sidebar { display: none !important; }
+  .bottom-nav { display: block; }
+  .main { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+  .sync-bar { font-size: 10px; padding: 6px 12px; }
+  .page-header { padding: 16px; flex-wrap: wrap; gap: 10px; }
+  .page-header h1 { font-size: 16px; }
+  .page-body { padding: 12px; }
   .grid-4 { grid-template-columns: 1fr 1fr; }
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
-  .page-body { padding: 16px; }
+  .modal { max-width: 100%; margin: 0; border-radius: var(--radius) var(--radius) 0 0; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  /* 태스크 보드 모바일: 세로 스크롤 */
+  #taskBoard { grid-template-columns: 1fr !important; }
+  .task-column { min-height: auto; }
+  /* 캘린더 모바일: 세로 */
+  #tripCalendarGrid { grid-template-columns: 1fr !important; }
+  /* 통계 카드 */
+  .stat-card .stat-value { font-size: 22px; }
+  /* 방문지 카드 */
+  .venue-card { padding: 14px; }
+  /* 터치 영역 최소 44px */
+  .btn-icon { min-width: 36px; min-height: 36px; }
+  .task-check { width: 24px; height: 24px; font-size: 13px; }
+  .task-item { padding: 12px; gap: 12px; }
+  .task-title { font-size: 14px; }
+  .task-meta { font-size: 12px; }
+  .task-actions { opacity: 1; }
+  /* 하단 탭 오버레이 닫기 */
+  .more-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 48;
+    display: none;
+  }
+  .more-overlay.open { display: block; }
+}
+@media (min-width: 769px) {
+  .bottom-nav { display: none !important; }
+  .more-overlay { display: none !important; }
 }
 </style>
 </head>
@@ -712,7 +832,7 @@ a { color: inherit; text-decoration: none; }
         <!-- 진행 현황 바 -->
         <div class="card" style="margin-bottom:20px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <div style="display:flex;align-items:center;gap:16px">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               <span style="font-size:13px;font-weight:700">방문 진행률</span>
               <span style="font-size:12px;color:var(--text2)">완료 <b id="stat-visited" style="color:var(--green)">0</b> / <b id="stat-total">9</b>곳</span>
               <span style="font-size:12px;color:var(--text2)">메모 <b id="stat-memos" style="color:var(--blue)">0</b>건</span>
@@ -752,8 +872,8 @@ a { color: inherit; text-decoration: none; }
       <div class="page-header">
         <div><h1>일정</h1><p>DAY별 방문 일정 — 드래그로 순서 변경</p></div>
         <div style="display:flex;gap:8px;align-items:center">
-          <select class="form-select" style="width:100px" id="addToDaySelect"></select>
-          <button class="btn btn-primary" onclick="openScheduleModalForDay()">+ 추가</button>
+          <select class="form-select" style="width:90px;font-size:13px" id="addToDaySelect"></select>
+          <button class="btn btn-primary btn-sm" onclick="openScheduleModalForDay()">+ 추가</button>
         </div>
       </div>
       <div class="page-body" style="overflow-x:auto">
@@ -773,7 +893,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <div class="page-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px" id="venueList"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:12px" id="venueList"></div>
       </div>
     </div>
 
@@ -782,8 +902,8 @@ a { color: inherit; text-decoration: none; }
       <div class="page-header">
         <div><h1>소싱 메모</h1><p>업체별 제품 · 단가 · MOQ 기록</p></div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="exportMemo()">📊 엑셀 복사</button>
-          <button class="btn btn-primary" onclick="openMemoModal()">+ 메모 추가</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportMemo()">📊 복사</button>
+          <button class="btn btn-primary btn-sm" onclick="openMemoModal()">+ 추가</button>
         </div>
       </div>
       <div class="page-body">
@@ -1213,6 +1333,40 @@ a { color: inherit; text-decoration: none; }
   <button class="btn btn-ghost btn-sm" onclick="closeFullscreen()">✕ 닫기</button>
 </div>
 
+<!-- More Overlay -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMore()"></div>
+
+<!-- Bottom Nav More Menu -->
+<div class="bottom-nav-more" id="bottomNavMore">
+  <button class="bottom-nav-more-item" onclick="goPage('contacts');closeMore()"><span class="icon">👤</span>연락처</button>
+  <button class="bottom-nav-more-item" onclick="goPage('map');closeMore()"><span class="icon">🗺️</span>지도</button>
+  <button class="bottom-nav-more-item" onclick="goPage('settings');closeMore()"><span class="icon">⚙️</span>설정 / 동기화</button>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-item active" id="bn-dashboard" onclick="goPage('dashboard')">
+      <span class="bn-icon">🏠</span><span>홈</span>
+    </button>
+    <button class="bottom-nav-item" id="bn-schedule" onclick="goPage('schedule')">
+      <span class="bn-icon">📅</span><span>일정</span>
+    </button>
+    <button class="bottom-nav-item" id="bn-venues" onclick="goPage('venues')">
+      <span class="bn-icon">🏭</span><span>방문지</span>
+    </button>
+    <button class="bottom-nav-item" id="bn-memo" onclick="goPage('memo')">
+      <span class="bn-icon">📝</span><span>메모</span>
+    </button>
+    <button class="bottom-nav-item" id="bn-photos" onclick="goPage('photos')">
+      <span class="bn-icon">📸</span><span>사진</span>
+    </button>
+    <button class="bottom-nav-item" id="bn-more" onclick="toggleMore()">
+      <span class="bn-icon">⋯</span><span>더보기</span>
+    </button>
+  </div>
+</nav>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -1253,20 +1407,23 @@ let bizCardData = null;
 async function handleBizCard(event) {
   const file = event.target.files[0];
   if (!file) return;
+  event.target.value = '';
 
-  // 미리보기
   const reader = new FileReader();
   reader.onload = async (e) => {
     const base64 = e.target.result;
     bizCardData = base64;
 
-    document.getElementById('bizCardPreview').innerHTML = `
-      <img src="${base64}" style="width:100%;border-radius:8px;border:1px solid var(--border);max-height:160px;object-fit:contain">
-    `;
+    // 미리보기
+    const preview = document.getElementById('bizCardPreview');
+    if (preview) {
+      preview.innerHTML = '<img src="' + base64 + '" style="width:100%;border-radius:8px;border:1px solid var(--border);max-height:160px;object-fit:contain">';
+    }
 
-    // Claude API로 명함 분석
     const statusEl = document.getElementById('bizCardStatus');
+    if (!statusEl) return;
     statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--accent)';
     statusEl.textContent = '🤖 명함 분석 중...';
 
     try {
@@ -1275,52 +1432,65 @@ async function handleBizCard(event) {
 
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 500,
           messages: [{
             role: 'user',
             content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: mediaType, data: imgBase64 }
-              },
-              {
-                type: 'text',
-                text: '이 명함에서 정보를 추출해주세요. 반드시 아래 JSON 형식으로만 답변하세요. 없는 정보는 빈 문자열로. {"name":"","wechat":"","phone":"","email":"","company":"","title":""}'
-              }
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: imgBase64 } },
+              { type: 'text', text: '이 명함에서 정보를 추출하세요. JSON만 출력하세요: {"name":"","wechat":"","phone":"","email":"","company":"","title":""}' }
             ]
           }]
         })
       });
 
+      if (!response.ok) {
+        throw new Error('API 오류: ' + response.status);
+      }
+
       const data = await response.json();
-      const text = data.content?.[0]?.text || '';
-      const jsonMatch = text.match(/{[\s\S]*?}/);
-      if (jsonMatch) {
-        const info = JSON.parse(jsonMatch[0]);
-        if (info.name) document.getElementById('contact-memo-name').value = info.name;
-        if (info.wechat) document.getElementById('contact-memo-wechat').value = info.wechat;
-        if (info.phone) document.getElementById('contact-memo-phone').value = info.phone;
-        if (info.email) document.getElementById('contact-memo-email').value = info.email;
-        if (info.company || info.title) {
-          document.getElementById('contact-memo-company').value = [info.company, info.title].filter(Boolean).join(' / ');
+      const text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
+      const match = text.match(/{[^{}]*}/);
+
+      if (match) {
+        try {
+          const info = JSON.parse(match[0]);
+          const fields = {
+            'contact-memo-name': info.name,
+            'contact-memo-wechat': info.wechat,
+            'contact-memo-phone': info.phone,
+            'contact-memo-email': info.email,
+            'contact-memo-company': [info.company, info.title].filter(Boolean).join(' / ')
+          };
+          Object.entries(fields).forEach(([id, val]) => {
+            const el = document.getElementById(id);
+            if (el && val) el.value = val;
+          });
+          statusEl.textContent = '✓ 자동 입력됨 — 확인 후 수정하세요';
+          statusEl.style.color = 'var(--green)';
+        } catch(pe) {
+          statusEl.textContent = '분석 완료 — 직접 입력해주세요';
+          statusEl.style.color = 'var(--text2)';
         }
-        statusEl.textContent = '✓ 명함 정보 자동 입력됨 — 확인 후 수정하세요';
-        statusEl.style.color = 'var(--green)';
       } else {
-        statusEl.textContent = '정보를 읽지 못했어요. 직접 입력해주세요.';
+        statusEl.textContent = '정보를 읽지 못했어요 — 직접 입력해주세요';
         statusEl.style.color = 'var(--text2)';
       }
     } catch(err) {
-      statusEl.textContent = '분석 실패 — 직접 입력해주세요';
-      statusEl.style.color = 'var(--text2)';
+      console.error('bizCard error:', err);
+      statusEl.textContent = '분석 실패 (' + err.message + ') — 직접 입력해주세요';
+      statusEl.style.color = 'var(--red)';
     }
   };
   reader.readAsDataURL(file);
-  event.target.value = '';
 }
+
 
 function saveToContacts() {
   const name = document.getElementById('contact-memo-name').value;
@@ -1434,13 +1604,38 @@ function goPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  document.querySelector(`.nav-item[onclick="goPage('${id}')"]`).classList.add('active');
+  const navItem = document.querySelector(`.nav-item[onclick="goPage('${id}')"]`);
+  if (navItem) navItem.classList.add('active');
+
+  // 하단 탭바 active 업데이트
+  const mainPages = ['dashboard','schedule','venues','memo','photos'];
+  document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+  const bnEl = document.getElementById('bn-' + id);
+  if (bnEl) bnEl.classList.add('active');
+  else {
+    const moreBtn = document.getElementById('bn-more');
+    if (moreBtn) moreBtn.classList.add('active');
+  }
+
   if (id === 'memo') renderMemos();
   if (id === 'venues') renderVenues();
   if (id === 'photos') renderPhotos();
   if (id === 'contacts') renderContacts();
   if (id === 'schedule') renderSchedule();
   if (id === 'map') renderMapLegend();
+}
+
+function toggleMore() {
+  const menu = document.getElementById('bottomNavMore');
+  const overlay = document.getElementById('moreOverlay');
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) { menu.classList.remove('open'); overlay.classList.remove('open'); }
+  else { menu.classList.add('open'); overlay.classList.add('open'); }
+}
+
+function closeMore() {
+  document.getElementById('bottomNavMore').classList.remove('open');
+  document.getElementById('moreOverlay').classList.remove('open');
 }
 
 // ===== RENDER ALL =====
@@ -1502,72 +1697,81 @@ function renderSchedule() {
 
   // 드롭다운 업데이트
   const sel = document.getElementById('addToDaySelect');
-  if (sel) sel.innerHTML = days.map(d => `<option value="${d}">DAY ${d}</option>`).join('');
+  if (sel) sel.innerHTML = days.map(d => '<option value="' + d + '">DAY ' + d + '</option>').join('');
 
-  board.style.gridTemplateColumns = `repeat(${Math.min(totalDays, 4)}, 1fr)`;
+  // DAY 탭 버튼
+  const activeDay = window.activeScheduleDay || 1;
+  const tabsHtml = '<div style="display:flex;gap:4px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">' +
+    '<button class="btn btn-sm" style="flex-shrink:0;padding:6px 12px;font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:99px" onclick="setScheduleDay(0)' + (activeDay === 0 ? ';this.style.background=\'var(--accent)\';this.style.color=\'#000\'' : '') + '"' +
+    (activeDay === 0 ? ' style="flex-shrink:0;padding:6px 12px;font-size:12px;background:var(--accent);color:#000;border-radius:99px;border:none"' : '') +
+    '>전체</button>' +
+    days.map(d => {
+      const dateStr = getDayDate(d);
+      const isActive = activeDay === d;
+      const color = dayColors[(d-1) % dayColors.length];
+      return '<button onclick="setScheduleDay(' + d + ')" style="flex-shrink:0;padding:6px 14px;font-size:12px;font-weight:700;border-radius:99px;border:2px solid ' + (isActive ? color : 'var(--border)') + ';background:' + (isActive ? color : 'transparent') + ';color:' + (isActive ? '#000' : 'var(--text2)') + ';cursor:pointer">DAY ' + d + (dateStr ? '<br><span style="font-size:9px;font-weight:400">' + dateStr + '</span>' : '') + '</button>';
+    }).join('') +
+    '</div>';
 
-  board.innerHTML = days.map(day => {
+  // 표시할 DAY 목록
+  const visibleDays = activeDay === 0 ? days : [activeDay];
+
+  // 세로 스택 레이아웃
+  board.style.gridTemplateColumns = '1fr';
+
+  const colsHtml = visibleDays.map(day => {
     const items = DB.schedule
       .filter(s => s.day == day)
       .sort((a,b) => {
-        const ai = DB.schedule.findIndex(x => x.id === a.id && x.day == day);
-        const bi = DB.schedule.findIndex(x => x.id === b.id && x.day == day);
-        // order 필드 있으면 우선, 없으면 time
         if (a.order !== undefined && b.order !== undefined) return a.order - b.order;
         return a.time.localeCompare(b.time);
       });
     const doneCount = items.filter(s => s.done).length;
-    const dateStr = getDayDate(day);
     const color = dayColors[(day-1) % dayColors.length];
+    const dateStr = getDayDate(day);
 
-    return `
-    <div class="task-column" id="col-day-${day}">
-      <div class="task-col-header">
-        <div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></div>
-            <span style="font-size:13px;font-weight:800">DAY ${day}</span>
-            ${dateStr ? `<span style="font-size:11px;color:var(--text2)">${dateStr}</span>` : ''}
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;margin-left:18px">${doneCount}/${items.length} 완료</div>
-        </div>
-        <button class="btn-icon" style="font-size:13px" title="DAY ${day}에 추가" onclick="openScheduleModal(); setTimeout(()=>{ const s=document.getElementById('sch-day'); if(s) s.value=${day}; },50)">+</button>
-      </div>
-      <div class="task-col-body" id="task-body-${day}"
-        ondragover="onDragOver(event,${day})"
-        ondrop="onDrop(event,${day})"
-        ondragleave="onDragLeave(event)">
-        ${items.length === 0
-          ? `<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">+ 일정을 추가하세요</div>`
-          : items.map((item, idx) => `
-            <div class="task-item ${item.done ? 'done-task' : ''}"
-              id="task-${item.id}"
-              draggable="true"
-              ondragstart="onDragStart(event,'${item.id}')"
-              ondragend="onDragEnd(event)">
-              <div class="task-check ${item.done ? 'checked' : ''}"
-                onclick="toggleSchedule('${item.id}')"
-                style="border-color:${color}">
-                ${item.done ? '✓' : ''}
-              </div>
-              <div class="task-body">
-                <div class="task-title ${item.done ? 'done' : ''}">${item.title}</div>
-                <div class="task-meta">
-                  <span class="task-time">${item.time}</span>
-                  ${item.transport ? `<span>${item.transport}</span>` : ''}
-                  ${item.note ? `<span style="color:var(--text3)">${item.note.slice(0,30)}${item.note.length>30?'…':''}</span>` : ''}
-                </div>
-              </div>
-              <div class="task-actions">
-                <button class="btn-icon" style="font-size:11px" onclick="openScheduleModal('${item.id}')">✏️</button>
-                <button class="btn-icon" style="font-size:11px" onclick="deleteSchedule('${item.id}')">🗑</button>
-              </div>
-            </div>`).join('')
-        }
-      </div>
-    </div>`;
+    return '<div class="task-column" id="col-day-' + day + '">' +
+      '<div class="task-col-header">' +
+      '<div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+      '<div style="width:10px;height:10px;border-radius:50%;background:' + color + ';flex-shrink:0"></div>' +
+      '<span style="font-size:14px;font-weight:800">DAY ' + day + '</span>' +
+      (dateStr ? '<span style="font-size:12px;color:var(--text2)">' + dateStr + '</span>' : '') +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--text3);margin-top:2px;margin-left:18px">' + doneCount + '/' + items.length + ' 완료</div>' +
+      '</div>' +
+      '<button class="btn-icon" style="font-size:16px;width:32px;height:32px" onclick="openScheduleModal(); setTimeout(function(){ var s=document.getElementById(\'sch-day\'); if(s) s.value=' + day + '; },50)">+</button>' +
+      '</div>' +
+      '<div class="task-col-body" id="task-body-' + day + '" ondragover="onDragOver(event,' + day + ')" ondrop="onDrop(event,' + day + ')" ondragleave="onDragLeave(event)">' +
+      (items.length === 0
+        ? '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">+ 일정을 추가하세요</div>'
+        : items.map(item =>
+            '<div class="task-item ' + (item.done ? 'done-task' : '') + '" id="task-' + item.id + '" draggable="true" ondragstart="onDragStart(event,\'' + item.id + '\')" ondragend="onDragEnd(event)">' +
+            '<div class="task-check ' + (item.done ? 'checked' : '') + '" onclick="toggleSchedule(\'' + item.id + '\')" style="border-color:' + color + '">' + (item.done ? '✓' : '') + '</div>' +
+            '<div class="task-body">' +
+            '<div class="task-title ' + (item.done ? 'done' : '') + '">' + item.title + '</div>' +
+            '<div class="task-meta">' +
+            '<span class="task-time">' + item.time + '</span>' +
+            (item.transport ? '<span>' + item.transport + '</span>' : '') +
+            (item.note ? '<span style="color:var(--text3)">' + item.note.slice(0,40) + (item.note.length > 40 ? '…' : '') + '</span>' : '') +
+            '</div></div>' +
+            '<div class="task-actions">' +
+            '<button class="btn-icon" style="font-size:13px;width:32px;height:32px" onclick="openScheduleModal(\'' + item.id + '\')">✏️</button>' +
+            '<button class="btn-icon" style="font-size:13px;width:32px;height:32px" onclick="deleteSchedule(\'' + item.id + '\')">🗑</button>' +
+            '</div></div>'
+          ).join('')
+      ) +
+      '</div></div>';
   }).join('');
+
+  board.innerHTML = tabsHtml + colsHtml;
 }
+
+function setScheduleDay(day) {
+  window.activeScheduleDay = day;
+  renderSchedule();
+}
+
 
 // ===== DRAG & DROP =====
 let dragId = null;
@@ -1864,49 +2068,79 @@ function saveMemo() {
 
 function renderMemos() {
   const container = document.getElementById('memoList');
+  if (!container) return;
   if (DB.memos.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="es-icon">📝</div><div class="es-title">소싱 메모가 없어요</div><div class="es-desc">방문지별로 제품 정보를 기록하세요</div></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="es-icon">📝</div><div class="es-title">소싱 메모가 없어요</div><div class="es-desc">방문지별로 제품 정보를 기록하세요</div></div>';
     return;
   }
   const grouped = {};
-  DB.memos.forEach(m => { if (!grouped[m.venueId]) grouped[m.venueId] = { name: m.venueName, items: [] }; grouped[m.venueId].items.push(m); });
-  container.innerHTML = Object.values(grouped).map(g => `
-    <div class="memo-card">
-      <div class="memo-card-header">
-        <div style="font-size:14px;font-weight:700">🏬 ${g.name}</div>
-        <span style="font-size:12px;color:var(--text2)">${g.items.length}개 제품</span>
-      </div>
-      <div class="memo-card-body">
-        ${g.items.map(m => `
-        <div class="memo-entry">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between">
-            <div class="me-product">${m.product}</div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div class="stars">${'★'.repeat(m.stars)}${'☆'.repeat(5-m.stars)}</div>
-              <button class="btn-icon" style="font-size:11px" onclick="deleteMemo('${m.id}')">🗑</button>
-            </div>
-          </div>
-          <div class="me-details">
-            <span class="badge badge-pending" style="margin-right:6px">${m.category}</span>
-            ${m.price ? `💰 $${m.price}` : ''} ${m.moq ? `· MOQ ${m.moq}개` : ''} · 샘플: ${m.sample} · 후속: ${m.followup}
-          </div>
-          ${m.note ? `<div class="me-note">"${m.note}"</div>` : ''}
-          ${m.contact && m.contact.name ? `
-          <div style="margin-top:8px;padding:8px 10px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--blue)">
-            <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px">👤 담당자</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.7">
-              ${m.contact.name ? `<b style="color:var(--text)">${m.contact.name}</b> ${m.contact.company ? '· ' + m.contact.company : ''}<br>` : ''}
-              ${m.contact.wechat ? `💬 WeChat: ${m.contact.wechat}<br>` : ''}
-              ${m.contact.phone ? `📞 ${m.contact.phone}<br>` : ''}
-              ${m.contact.email ? `✉️ ${m.contact.email}` : ''}
-            </div>
-            ${m.contact.bizCard ? `<img src="${m.contact.bizCard}" style="width:100%;margin-top:6px;border-radius:4px;border:1px solid var(--border);max-height:80px;object-fit:contain;cursor:pointer" onclick="openFullscreenData('${m.contact.bizCard}','명함')">` : ''}
-          </div>` : ''}
-          <div style="font-size:10px;color:var(--text3);margin-top:6px">${m.createdAt}</div>
-        </div>`).join('')}
-      </div>
-    </div>`).join('');
+  DB.memos.forEach(m => {
+    const key = m.venueId || 'unknown';
+    if (!grouped[key]) grouped[key] = { name: m.venueName || '업체 미지정', items: [] };
+    grouped[key].items.push(m);
+  });
+
+  container.innerHTML = Object.values(grouped).map(g => {
+    const itemsHtml = g.items.map(m => {
+      const stars = '★'.repeat(m.stars || 0) + '☆'.repeat(5 - (m.stars || 0));
+      // 사진 그리드
+      const photosHtml = (m.photos && m.photos.length > 0)
+        ? '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">' +
+          m.photos.map(p => '<div style="aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--border);cursor:pointer" onclick="openFullscreenData(\'' + p.data.substring(0,30).replace(/'/g,'') + '...\',\'' + (m.product||'') + '\')">' +
+            '<img src="' + p.data + '" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>').join('') +
+          '</div>'
+        : '';
+      // 담당자
+      const contactHtml = (m.contact && m.contact.name)
+        ? '<div style="margin-top:10px;padding:10px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--blue)">' +
+          '<div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px">👤 담당자</div>' +
+          '<div style="font-size:12px;color:var(--text2);line-height:1.8">' +
+          (m.contact.name ? '<b style="color:var(--text)">' + m.contact.name + '</b>' + (m.contact.company ? ' · ' + m.contact.company : '') + '<br>' : '') +
+          (m.contact.wechat ? '💬 ' + m.contact.wechat + '<br>' : '') +
+          (m.contact.phone ? '📞 ' + m.contact.phone + '<br>' : '') +
+          (m.contact.email ? '✉️ ' + m.contact.email : '') +
+          '</div>' +
+          (m.contact.bizCard ? '<img src="' + m.contact.bizCard + '" style="width:100%;margin-top:6px;border-radius:4px;max-height:80px;object-fit:contain">' : '') +
+          '</div>'
+        : '';
+
+      return '<div class="memo-entry">' +
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">' +
+        '<div class="me-product" style="flex:1">' + (m.product || '') + '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
+        '<div class="stars" style="font-size:12px">' + stars + '</div>' +
+        '<button class="btn-icon" style="font-size:11px" onclick="openMemoDetail(\'' + m.id + '\')">✏️</button>' +
+        '<button class="btn-icon" style="font-size:11px" onclick="deleteMemo(\'' + m.id + '\')">🗑</button>' +
+        '</div></div>' +
+        '<div class="me-details" style="margin-top:6px">' +
+        '<span class="badge badge-pending" style="margin-right:6px">' + (m.category || '') + '</span>' +
+        (m.price ? '💰 $' + m.price : '') +
+        (m.moq ? ' · MOQ ' + m.moq + '개' : '') +
+        ' · 샘플: ' + (m.sample || '-') +
+        ' · 후속: ' + (m.followup || '-') +
+        '</div>' +
+        (m.note ? '<div class="me-note" style="margin-top:6px">"' + m.note + '"</div>' : '') +
+        photosHtml +
+        contactHtml +
+        '<div style="font-size:10px;color:var(--text3);margin-top:8px">' + (m.createdAt || '') + '</div>' +
+        '</div>';
+    }).join('');
+
+    return '<div class="memo-card">' +
+      '<div class="memo-card-header">' +
+      '<div style="font-size:14px;font-weight:700">🏬 ' + g.name + '</div>' +
+      '<span style="font-size:12px;color:var(--text2)">' + g.items.length + '개 제품</span>' +
+      '</div>' +
+      '<div class="memo-card-body">' + itemsHtml + '</div>' +
+      '</div>';
+  }).join('');
 }
+
+function openMemoDetail(id) {
+  // 추후 확장: 메모 상세 편집 모달
+  toast('수정 기능 준비 중');
+}
+
 
 function deleteMemo(id) {
   DB.memos = DB.memos.filter(m => m.id !== id);
@@ -1964,18 +2198,28 @@ function savePhotos() {
   const venueId = document.getElementById('photo-venue-select').value;
   const venueName = DB.venues.find(v => v.id === venueId)?.name || '';
   const caption = document.getElementById('photo-caption').value;
+  const filesToProcess = [...pendingPhotos];
+  if (filesToProcess.length === 0) { toast('사진을 선택하세요', 'error'); return; }
   let saved = 0;
-  pendingPhotos.forEach(file => {
+  const total = filesToProcess.length;
+  filesToProcess.forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
       DB.photos.push({ id: uid(), venueId, venueName, caption, data: e.target.result, fileName: file.name, createdAt: new Date().toLocaleString('ko-KR') });
       saved++;
-      if (saved === pendingPhotos.length) { saveData(); renderPhotos(); updateStats(); updatePhotoVenueFilter(); closeModal('modal-photo-caption'); toast(`사진 ${saved}장 저장됨`); syncPhotos(); }
+      if (saved === total) {
+        saveData(); renderPhotos(); updateStats(); updatePhotoVenueFilter();
+        closeModal('modal-photo-caption');
+        toast(total + '장 저장됨 ✓');
+        syncPhotos();
+        pendingPhotos = [];
+        document.getElementById('photo-caption').value = '';
+        document.getElementById('photoPreviewArea').innerHTML = '';
+      }
     };
+    reader.onerror = () => { saved++; };
     reader.readAsDataURL(file);
   });
-  pendingPhotos = [];
-  document.getElementById('photo-caption').value = '';
 }
 
 function renderPhotos() {
